@@ -4,8 +4,7 @@ const sessionRoutesFn = ((io)=>{
 
   const pagesFn = require("../controllers/sessionsControllers")
 
-  const { register, registerPost, registerDelete } = pagesFn(io)
-  
+  const { register, registerPost, registerDelete, resetPassword } = pagesFn(io)  
 
 const router = Router();
 
@@ -14,6 +13,8 @@ const router = Router();
   router.post("/register", registerPost);
 
   router.delete("/register", registerDelete);
+
+  router.post("/resetPassword", resetPassword);
 
   return router;
 

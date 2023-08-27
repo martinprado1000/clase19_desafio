@@ -12,9 +12,14 @@ const pagesFn = (io) => {
     res.render("login");
   };
 
+  const recoveryPassword = async (req, res) => {
+    res.render("recoveryPassword.handlebars");
+  };
+
   return {
     register,
-    login
+    login,
+    recoveryPassword
   };
 };
 

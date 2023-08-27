@@ -1,4 +1,5 @@
 const { UserManagerDb } = require("../dao/userManagerDb");
+const { isValidPassword } = require("../utils/passwordHash");
 
 const pagesFn = (io) => {
   const manager = new UserManagerDb(io);
@@ -6,17 +7,15 @@ const pagesFn = (io) => {
   // router.get("/", register);
   // router.post("/register", registerPost);
   // router.delete("/register/:uid", registerDelete);
+  // router.post("/resetPassword", serestPassword);
 
   const register = async (req, res) => {
-    console.log("gettttttttttttttttt");
-    console.log(data);
+    //console.log(data);
   };
 
   const registerPost = async (req, res) => {
     const data = req.body;
-    //console.log(data);
     let response = await manager.getUser(data.email);
-    console.log(response.rol);
     if (response == null) {
       console.log(`El usuario ${data.email} no existe`);
       res.json({
@@ -25,7 +24,9 @@ const pagesFn = (io) => {
       });
       return;
     }
-    if (data.password != response.password) {
+    //console.log(isValidPassword(data.password,response.password)) // Aca comparo la password que me pasaron con la password hasheada, esto me retorna true o false.
+    if (!isValidPassword(data.password, response.password)) {
+      // Chequeo si las password hacen match pero antes paso la password por nuestra funcion de hash para poder comprarlas.
       console.log(`Contraseña invalida`);
       res.json({
         status: 400,
@@ -68,10 +69,27 @@ const pagesFn = (io) => {
     });
   };
 
+  const resetPassword = async (req, res) => {
+    const data = req.body;
+    let response = await manager.getUser(data.email);
+    if (response == null) {
+      console.log(`El usuario ${data.email} no existe`);
+      res.json({
+        status: 400,
+        data: `El usuario ${data.email} no existe`,
+      });
+      return;
+    }
+    let responseRecovery = await manager.recoveryPassword(data);
+    console.log(responseRecovery);
+    res.json(responseRecovery);
+  };
+
   return {
     register,
     registerPost,
     registerDelete,
+    resetPassword,
   };
 };
 

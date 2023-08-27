@@ -1,6 +1,7 @@
 //const fs = require("fs");
 const session = require("express-session");
 const userModel = require("../models/userModel");
+const { hashPassword } = require("../utils/passwordHash");
 
 class UserManagerDb {
   constructor(io) {
@@ -10,9 +11,7 @@ class UserManagerDb {
   async getUser(email) {
     try {
       const user = await userModel.findOne({ email: email });
-      return user
-      // let products = await productModel.find();
-      // return products.map((p) => p.toObject());
+      return user;
     } catch (e) {
       console.log("Error al leer la db");
       return { status: 500, data: "Error al leer la db" };
@@ -22,22 +21,29 @@ class UserManagerDb {
   async createUser(data) {
     // Con este metodo creo 100 productos
     try {
-      console.log(data)
+      //console.log(data.password)
       const exist = await this.getUser(data.email);
-      //console.log(exist);
+      data.password = hashPassword(data.password); // Llamamos a nustra funcion para hashear la password
+      //console.log(data.password)
       if (exist == null) {
         const user = await userModel.create(data);
-        console.log(user)
-        console.log(`Usuario ${data.email} creado correctamente`)
+        console.log(user);
+        console.log(`Usuario ${data.email} creado correctamente`);
         this.io.emit(
           "registerUser",
-          JSON.stringify({ status: 200, data: `Usuario ${data.email} creado correctamente` })
+          JSON.stringify({
+            status: 200,
+            data: `Usuario ${data.email} creado correctamente`,
+          })
         );
         return;
       }
       this.io.emit(
         "errorRegister",
-        JSON.stringify({ status: 400, data: `El Usuario ${data.email} ya existe` })
+        JSON.stringify({
+          status: 400,
+          data: `El Usuario ${data.email} ya existe`,
+        })
       );
       return;
     } catch (e) {
@@ -47,6 +53,25 @@ class UserManagerDb {
         JSON.stringify({ error: 400, data: "Error al leer la db" })
       );
       return;
+    }
+  }
+
+  async recoveryPassword(data) {
+    // Con este metodo creo 100 productos
+    try {
+      console.log(data);
+      const newPassword = hashPassword(data.password);
+      console.log(newPassword)
+      await userModel.updateOne( { email: data.email } , { password:newPassword }
+      );
+      console.log( `Usuario ${data.email}, cambio la contraseña satisfactiriamente`);
+      return {
+        status: 200,
+        data: `Usuario ${data.email}, cambio la contraseña satisfactiriamente`,
+      };
+    } catch (e) {
+      console.log("Error al leer la db");
+      return { status: 500, data: "Error al leer la db" };
     }
   }
 

@@ -3,7 +3,7 @@ const { Router } = require("express");
 const viewSessionRoutesFn = (io) => {
   const pagesFn = require("../controllers/sessionsViewControllers");
 
-  const { register, login } = pagesFn(io);
+  const { register, login, recoveryPassword } = pagesFn(io);
 
   const router = Router();
 
@@ -17,6 +17,8 @@ const viewSessionRoutesFn = (io) => {
   router.get("/register", sessionMiddleware, register); // // Aca le agregue el middleware para que si ya a iniciado session no pueda ir a la paginoa de register
 
   router.get("/login", sessionMiddleware, login); // Aca le agregue el middleware para que si ya a iniciado session no pueda ir a la paginoa de login
+
+  router.get("/recovery-password", recoveryPassword);
 
   return router;
 };

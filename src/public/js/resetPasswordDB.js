@@ -1,36 +1,27 @@
 const socket = io();
 console.log(socket);
 
-const submitFormLogin = document.getElementById("formLoginUser");
-const btnLogin = document.getElementById("btnLogin");
-const email = document.getElementById("emailLogin");
-const password = document.getElementById("passwordLogin");
+const submitFormResetPassword = document.getElementById("formResetPassword");
+const btnNewPassword = document.getElementById("btnNewPassword")
+const emailResetPassword = document.getElementById("emailResetPassword");
+const newPassword = document.getElementById("newPassword");
 
-// submitFormLogin.addEventListener("submit", (e) => {
-//   e.preventDefault();
-//   const data = {
-//     email: email.value,
-//     password: password.value,
-//   };
-//   console.log(data);
-//   socket.emit("loginUser", data);
-// });
-
-submitFormLogin.addEventListener("submit", async (e) => {
+submitFormResetPassword.addEventListener("submit", async (e) => {
   e.preventDefault();
   const data = {
-    email: email.value,
-    password: password.value,
+    email: emailResetPassword.value,
+    password: newPassword.value,
   };
+  console.log(data)
   try {
-    await fetch("/api/register", {
+    await fetch("/api/resetPassword", {
       method: "POST",
       headers: { "Content-type": "application/json;charset=UTF-8" },
       body: JSON.stringify(data),
     })
       .then((response) => response.json())
       .then((res) => {
-        //console.log(res);
+        console.log("asdasdasdasdasd");
         if (res.status == 200){
           Swal.fire({
             title: `${res.data}`,
@@ -48,8 +39,8 @@ submitFormLogin.addEventListener("submit", async (e) => {
             timer: 2000,
             timerProgressBar: true,
           });
-          email.value = "";
-          password.value = "";
+          emailResetPassword.value = "";
+          newPassword.value = "";
         }
       });
   } catch (e) {
